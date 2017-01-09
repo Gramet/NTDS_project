@@ -8,7 +8,8 @@ To do list :
 Done : 
 -
 
-
+Project insight:
+-
 
 The goal  of this project is to predict the gender of twitter users based on various features, especially on the tweets they post. We will try to analyze how well do words in tweets can define the gender of a user, and also see which words are the most important for gender prediction.  
 
