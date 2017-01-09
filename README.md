@@ -4,6 +4,10 @@ NTDS project : Twitter users gender classification
 To do list : 
 -
 
+- data exploration, find word predictors in text/description, find color predictors in sidebar and link color profile
+- (optional) provide image to [google feature extraction](cloud.google.com/vision) for example, find features predictors based on text 
+- display predictors
+
 
 Done : 
 -
