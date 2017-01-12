@@ -4,9 +4,9 @@ NTDS project : Twitter users gender classification
 To do list : 
 -
 
-- data exploration, 
-- , then (optional) by combining and weighting the features
-
+- then (optional) by combining and weighting the features
+- Test with external data
+- Maybe get other datasets (facebook, multiple tweets of single user,...)
 
 Done : 
 -
