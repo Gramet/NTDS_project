@@ -140,10 +140,15 @@ def compute_bag_of_words(text):
 
 
 #Exploration of which words are most used by which gender
-def print_most_frequent(bow, vocab, gender, n=20):
+def print_most_frequent(bow, vocab, gender, n=20, feature = 'text'):
+    switcher = {
+        'all_text' : "text",
+        'pic_text' : "profile picture features",
+    }
+    featureText =  switcher.get(feature, 'text')
     color_idx = ['brand', 'female', 'male']
     color_table = ['#4a913c', '#f5abb5', '#0084b4']
-    label_table = ['Most used words by brands', 'Most used words by females', 'Most used words by Males']
+    label_table = ['Most used words by brands for ' + featureText, 'Most used words by females for ' + featureText, 'Most used words by males for ' + featureText]
     idx = np.argsort(bow.sum(axis=0))
     idx_most_used = np.zeros(n)
     occurence_number = np.zeros(n)
@@ -275,11 +280,11 @@ def model_test(model,X_train,y_train,X_test,y_test, full_voc, displayResults = T
             plt.yticks(pred_number,female_pred_label)
         plt.xlabel('Predictor')
         plt.ylabel('Weight')
-        plt.title('Best 20 female predictors for ' + featureText)
+        plt.title('Best 20 Female predictors for ' + featureText)
         plt.tight_layout()
         plt.show()
     # Female Anti-Predictors    
-        print('Best 20 female anti-predictors for ' + featureText + ':')
+        print('Best 20 Female anti-predictors for ' + featureText + ':')
         idx_female = np.argsort(-(W[1,:]))
         weight_female_antipred = np.zeros(20)
         female_antipred_label = ["" for x in range(20)]
@@ -302,7 +307,7 @@ def model_test(model,X_train,y_train,X_test,y_test, full_voc, displayResults = T
             plt.yticks(pred_number,female_antipred_label)
         plt.xlabel('Anti-Predictor')
         plt.ylabel('Weight')
-        plt.title('Best 20 female anti-predictors for ' + featureText)
+        plt.title('Best 20 Female anti-predictors for ' + featureText)
         plt.tight_layout()
         plt.show()
     # Brand Predictors    
@@ -329,11 +334,11 @@ def model_test(model,X_train,y_train,X_test,y_test, full_voc, displayResults = T
             plt.yticks(pred_number,brand_pred_label)
         plt.xlabel('Predictor')
         plt.ylabel('Weight')
-        plt.title('Best 20 brand predictors for ' + featureText)
+        plt.title('Best 20 Brand predictors for ' + featureText)
         plt.tight_layout()
         plt.show()
     # Brand Anti-Predictors    
-        print('Best 20 brand anti-predictors for ' + featureText + ':')
+        print('Best 20 Brand anti-predictors for ' + featureText + ':')
         idx_brand = np.argsort(-(W[0,:]))
         weight_brand_antipred = np.zeros(20)
         brand_antipred_label = ["" for x in range(20)]
@@ -356,7 +361,7 @@ def model_test(model,X_train,y_train,X_test,y_test, full_voc, displayResults = T
             plt.yticks(pred_number,brand_antipred_label)
         plt.xlabel('Anti-Predictor')
         plt.ylabel('Weight')
-        plt.title('Best 20 brand anti-predictors for ' + featureText)
+        plt.title('Best 20 Brand anti-predictors for ' + featureText)
         plt.tight_layout()
         plt.show()
     
