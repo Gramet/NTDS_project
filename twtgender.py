@@ -93,7 +93,7 @@ def colorsGraphs(df, feature, genderConfidence = 1, nbToRemove = 1):
     plt.yticks(rangeColFemale, colorsHexFemale)
     plt.xlabel('Color')
     plt.ylabel(feature)
-    plt.title('Most used colors by Females')
+    plt.title('Most used colors by Females for ' + feature + '\n' + str(nbToRemove) + ' most common occurences removed')
     plt.tight_layout()
     plt.show()
     
@@ -104,7 +104,7 @@ def colorsGraphs(df, feature, genderConfidence = 1, nbToRemove = 1):
     plt.yticks(rangeColMale, colorsHexMale)
     plt.xlabel('Color')
     plt.ylabel(feature)
-    plt.title('Most used colors by Males')
+    plt.title('Most used colors by Males for ' + feature + '\n' + str(nbToRemove) + ' most common occurences removed')
     plt.tight_layout()
     plt.show()
     
@@ -115,7 +115,7 @@ def colorsGraphs(df, feature, genderConfidence = 1, nbToRemove = 1):
     plt.yticks(rangeColBrand, colorsHexBrand)
     plt.xlabel('Color')
     plt.ylabel(feature)
-    plt.title('Most used colors by Brands')
+    plt.title('Most used colors by Brands for ' + feature + '\n' + str(nbToRemove) + ' most common occurences removed')
     plt.tight_layout()
     plt.show()
 
