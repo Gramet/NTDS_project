@@ -4,9 +4,7 @@ NTDS project : Twitter users gender classification
 To do list : 
 -
 
-- then (optional) by combining and weighting the features
-- Test with external data
-- Maybe get other datasets (facebook, multiple tweets of single user,...)
+- put more models
 
 Done : 
 -
@@ -15,6 +13,9 @@ Done :
 - (optional) provide image to [google feature extraction](https://cloud.google.com/vision) for example, find features predictors based on text
 - display predictors
 - create model for prediction, first with separate features
+- then (optional) by combining and weighting the features
+- Test with external data
+- Maybe get other datasets (facebook, multiple tweets of single user,...)
 
 
 Project insight:
