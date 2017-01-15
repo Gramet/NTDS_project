@@ -36,7 +36,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 from IPython.display import display
 from sklearn import linear_model, metrics
-
+from sklearn import naive_bayes
 
 #Definition of function for data exploration for the colors
 #feature : 'sidebar_color', 'link_color'
