@@ -392,7 +392,7 @@ def predictors(df, feature, model, modelname, displayResults = True, displayColo
     
     return model, full_voc, acc
 	
-def test_external_data(text, full_voc, model, feature):
+def test_external_data(text, full_voc, model, feature, display = True):
     gender_list = ['brand', 'female', 'male']
     vect = CountVectorizer(vocabulary=full_voc)
     new_bow = vect.fit_transform(text).toarray()
@@ -402,28 +402,30 @@ def test_external_data(text, full_voc, model, feature):
     
     if(hasattr(model, 'predict_proba')):
         proba = model.predict_proba(new_bow)
-        
-        print('The predicted gender by using the', feature, 'is', gender_list[predicted_class[0]],'with probability',np.sort(proba[0])[2])
+        if(display):
+            print('The predicted gender by using the', feature, 'is', gender_list[predicted_class[0]],'with probability',np.sort(proba[0])[2])
         return proba, predicted_class
     else:
-        print('The predicted gender by using the', feature, 'is', gender_list[predicted_class[0]])
+        if(display):
+            print('The predicted gender by using the', feature, 'is', gender_list[predicted_class[0]])
         return [], predicted_class
  
  
-def combine_features(model_text, model_pic, model_color, data, voc_text, voc_pic, voc_color, acc_text, acc_pic, acc_color):
+def combine_features(model_text, model_pic, model_color, data, voc_text, voc_pic, voc_color, acc_text, acc_pic, acc_color, display = True):
     gender_list =['brand', 'female', 'male']
     success = 0
+    resultList = [[0,0,0],[0,0,0],[0,0,0]]
     for i in range(0,len(data)):
-        proba_text, class_text = test_external_data(data['all_text'][i:i+1], voc_text, model_text, 'text')
-        proba_pic, class_pic = test_external_data(data['pic_text'][i:i+1], voc_pic, model_pic, 'profile picture')
-        proba_color, class_color = test_external_data(data['link_color'][i:i+1], voc_color, model_color, 'link color')
+        proba_text, class_text = test_external_data(data['all_text'][i:i+1], voc_text, model_text, 'text', display = display)
+        proba_pic, class_pic = test_external_data(data['pic_text'][i:i+1], voc_pic, model_pic, 'profile picture', display = display)
+        proba_color, class_color = test_external_data(data['link_color'][i:i+1], voc_color, model_color, 'link color', display = display)
         
         if(proba_text!=[] and proba_pic!=[] and proba_color!=[]):
             weighted_proba = (proba_text*acc_text + proba_pic*acc_pic + proba_color*acc_color)/(acc_text + acc_pic + acc_color)
             proba = weighted_proba[0]
-            print(proba[0])
             pred_class = (np.argsort(proba))[2]
-            print('Overall, the predicted gender of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class], 'with a confidence of',proba[pred_class])
+            if(display):
+                print('Overall, the predicted gender of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class], 'with a confidence of',proba[pred_class])
         else:
             result=np.zeros(3)
             result[class_text] = result[class_text]+1
@@ -433,9 +435,63 @@ def combine_features(model_text, model_pic, model_color, data, voc_text, voc_pic
                 pred_class = class_pic
             else:
                 pred_class = (np.argsort(result))[2]
-            print('Overall, the predicted gender  of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class])
+            if(display):
+                print('Overall, the predicted gender  of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class])
         if(gender_list[pred_class]==data.iloc[i]['gender']):
              success = success+1
+        originalGender = gender_list.index(data.iloc[i]['gender'])
+        resultList[originalGender][pred_class] = resultList[originalGender][pred_class] + 1
     success_rate = success/len(data)
     print('The average success rate for this test data is',success_rate)    
-      
+    return resultList
+
+
+
+def display_resultList(resultList):
+    fig2, ax2 = plt.subplots()
+    ax2.set_ylim([-0.5, 3.5]);
+    bar_width = 0.5
+    rects1 = plt.barh(range(0,3),[x[0] for x in resultList], bar_width, color = '#4a913c', label = 'brand')
+    rects2 = plt.barh(range(0,3), [x[1] for x in resultList], bar_width, color = '#f5abb5', left = [x[0] for x in resultList], label = 'female')
+    rects3 = plt.barh(range(0,3), [x[2] for x in resultList], bar_width, color = '#0084b4', left = [x[0] + x[1] for x in resultList], label = 'male')
+    plt.yticks(range(0,3) ,['brand', 'female', 'male'])
+    plt.xlabel('Number of users')
+    plt.ylabel('Gender')
+    plt.title('Predicted gender vs. Real gender')
+    plt.legend(loc='upper right')
+    plt.tight_layout()
+    plt.show()
+        
+
+def combine_features_without_pic(model_text, model_color, data, voc_text, voc_color, acc_text, acc_color, display = True):
+    gender_list =['brand', 'female', 'male']
+    success = 0
+    resultList = [[0,0,0],[0,0,0],[0,0,0]]
+    for i in range(0,len(data)):
+        proba_text, class_text = test_external_data(data['all_text'][i:i+1], voc_text, model_text, 'text', display = display)
+        proba_color, class_color = test_external_data(data['link_color'][i:i+1], voc_color, model_color, 'link color', display = display)
+        
+        if(proba_text!=[] and proba_color!=[]):
+            weighted_proba = (proba_text*acc_text +proba_color*acc_color)/(acc_text + acc_color)
+            proba = weighted_proba[0]
+            pred_class = (np.argsort(proba))[2]
+            if(display):
+                print('Overall, the predicted gender of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class], 'with a confidence of',proba[pred_class])
+        else:
+            result=np.zeros(2)
+            result[class_text] = result[class_text]+1
+            result[class_color] = result[class_color]+1
+            if(np.max(result)==1):
+                pred_class = class_text
+            else:
+                pred_class = (np.argsort(result))[1]
+            if(display):
+                print('Overall, the predicted gender  of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class])
+        if(gender_list[pred_class]==data.iloc[i]['gender']):
+             success = success+1
+        originalGender = gender_list.index(data.iloc[i]['gender'])
+        resultList[originalGender][pred_class] = resultList[originalGender][pred_class] + 1
+    success_rate = success/len(data)
+    print('The average success rate for this test data is',success_rate)    
+    return resultList
+        
