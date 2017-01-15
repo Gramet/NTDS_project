@@ -36,7 +36,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 from IPython.display import display
 from sklearn import linear_model, metrics
-
+from sklearn import naive_bayes
 
 #Definition of function for data exploration for the colors
 #feature : 'sidebar_color', 'link_color'
@@ -195,13 +195,15 @@ def model_test(model,X_train,y_train,X_test,y_test, full_voc, displayResults = T
     mse = metrics.mean_squared_error(y_test,y_pred)
     print('mse: {:.4f}'.format(mse))
 
-    # W contain the weight for each predictor, for each gender
-    W = model.coef_
-    
     # Prints the accuracy of the gender prediction
     acc = model.score(X_test,y_test)
     print('score: ', acc)
-    if(displayResults):
+    
+    
+    if(displayResults&hasattr(model,'coef_')):
+    # W contain the weight for each predictor, for each gender
+        W = model.coef_
+    
     # Male Predictors 
         print('Best 20 male predictors:')
         idx_male = np.argsort((W[2,:]))
@@ -415,11 +417,24 @@ def combine_features(model_text, model_pic, model_color, data, voc_text, voc_pic
         proba_text, class_text = test_external_data(data['all_text'][i:i+1], voc_text, model_text, 'text')
         proba_pic, class_pic = test_external_data(data['pic_text'][i:i+1], voc_pic, model_pic, 'profile picture')
         proba_color, class_color = test_external_data(data['link_color'][i:i+1], voc_color, model_color, 'link color')
-
-        proba = (proba_text*acc_text + proba_pic*acc_pic + proba_color*acc_color)/(acc_text + acc_pic + acc_color)
-        pred_class = ((np.argsort(proba[0])))
-        print('Overall, the predicted gender of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class[2]], 'with a confidence of',proba[0][pred_class[2]])
-        if(gender_list[pred_class[2]]==data.iloc[i]['gender']):
+        
+        if(proba_text!=[] and proba_pic!=[] and proba_color!=[]):
+            weighted_proba = (proba_text*acc_text + proba_pic*acc_pic + proba_color*acc_color)/(acc_text + acc_pic + acc_color)
+            proba = weighted_proba[0]
+            print(proba[0])
+            pred_class = (np.argsort(proba))[2]
+            print('Overall, the predicted gender of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class], 'with a confidence of',proba[pred_class])
+        else:
+            result=np.zeros(3)
+            result[class_text] = result[class_text]+1
+            result[class_pic] = result[class_pic]+1
+            result[class_color] = result[class_color]+1
+            if(np.max(result)==1):
+                pred_class = class_pic
+            else:
+                pred_class = (np.argsort(result))[2]
+            print('Overall, the predicted gender  of user',data.iloc[i]['user_name'], 'is' ,gender_list[pred_class])
+        if(gender_list[pred_class]==data.iloc[i]['gender']):
              success = success+1
     success_rate = success/len(data)
     print('The average success rate for this test data is',success_rate)    
